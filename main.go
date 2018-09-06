@@ -1,12 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"rayt/primitive"
+)
 
 func main() {
 	nx, ny := 200, 100
 	fmt.Println("P3")
 	fmt.Println(nx, ny)
 	fmt.Println("255")
+	_ = primitive.NewVector(0, 0, 0)
 	for j := 0; j < ny; j++ {
 		for i := 0; i < nx; i++ {
 			r := float64(j) / float64(ny)
