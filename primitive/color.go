@@ -1,5 +1,9 @@
 package primitive
 
+import (
+	"math"
+)
+
 // Color is a RGB color
 type Color struct {
 	R, G, B float64
@@ -15,6 +19,11 @@ func (c Color) Add(o Color) Color {
 	return Color{c.R + o.R, c.G + o.G, c.B + o.B}
 }
 
+// Mul do the mul operation on color
+func (c Color) Mul(o Color) Color {
+	return Color{c.R * o.R, c.G * o.G, c.B * o.B}
+}
+
 // Div do the div operation on color
 func (c Color) Div(o float64) Color {
 	return Color{c.R / o, c.G / o, c.B / o}
@@ -23,4 +32,9 @@ func (c Color) Div(o float64) Color {
 // Vec converts color to a vec
 func (c Color) Vec() Vector {
 	return Vector{c.R, c.G, c.B}
+}
+
+// Gamma fix color with gamma encoding
+func (c Color) Gamma() Color {
+	return Color{math.Sqrt(c.R), math.Sqrt(c.G), math.Sqrt(c.B)}
 }

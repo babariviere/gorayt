@@ -8,11 +8,12 @@ import (
 type Sphere struct {
 	Center Point
 	Radius float64
+	Material
 }
 
 // NewSphere initialize a new sphere with given values
-func NewSphere(Center Point, Radius float64) Sphere {
-	return Sphere{Center, Radius}
+func NewSphere(Center Point, Radius float64, Material Material) Sphere {
+	return Sphere{Center, Radius, Material}
 }
 
 // see: http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
@@ -49,8 +50,9 @@ func (s Sphere) Hit(r Ray, tmin, tmax float64) (_ bool, rec Hit) {
 	if t0 > tmax {
 		return false, rec
 	}
+	rec.Material = s.Material
 	rec.Distance = t0
-	rec.Normal.Origin = r.PointAt(t0)
-	rec.Normal.Direction = rec.Normal.Origin.Sub(s.Center).Vec().Div(s.Radius)
+	rec.Point = r.PointAt(t0)
+	rec.Normal = rec.Point.Sub(s.Center).Vec().Div(s.Radius)
 	return true, rec
 }

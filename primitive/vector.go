@@ -3,6 +3,7 @@ package primitive
 import (
 	"fmt"
 	"math"
+	"math/rand"
 )
 
 // Vector is a mathematical representation of a vector.
@@ -92,7 +93,26 @@ func (v Vector) Normalize() Vector {
 	return v.Div(v.Len())
 }
 
+// Cross calculates the cross product of two vector
+func (v Vector) Cross(o Vector) Vector {
+	return Vector{
+		v.Y*o.Z - v.Z*o.Y,
+		v.Z*o.X - v.X*o.Z,
+		v.X*o.Y - v.Y*o.X,
+	}
+}
+
 // Color converts a vector to a color
 func (v Vector) Color() Color {
 	return Color{v.X, v.Y, v.Z}
+}
+
+// RandomUnitSphere returns a random point in a unit radius sphere
+func RandomUnitSphere() (v Vector) {
+	for {
+		v = Vector{rand.Float64(), rand.Float64(), rand.Float64()}.Mul(2.0).Sub(Vector{1, 1, 1})
+		if v.Dot(v) < 1 {
+			return
+		}
+	}
 }
