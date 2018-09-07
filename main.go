@@ -50,13 +50,17 @@ func color(r p.Ray, w p.World, depth int) p.Color {
 		return p.Color{}
 	}
 	dir := r.Direction.Normalize()
-	t := 0.5 * (dir.Y + 1.0)
+	t := 0.8 * (dir.Y + 1.0)
 	return while.Vec().Mul(1 - t).Add(blue.Vec().Mul(t)).Color()
 }
 
 const (
 	nthreads = 16
-	samples  = 100
+	samples  = 500
+	fov      = 90.0
+	width    = 1920
+	height   = 1080
+	aperture = 0.0
 )
 
 func render(camera p.Camera, world p.World, samples int, x, y int, rnd *rand.Rand) c.NRGBA {
@@ -80,9 +84,7 @@ func render(camera p.Camera, world p.World, samples int, x, y int, rnd *rand.Ran
 func main() {
 	lookfrom := p.NewPoint(-2, 2, 1)
 	lookat := p.NewPoint(0, 0, -1)
-	fov := 90
-	aperture := 2.0
-	camera := p.NewCamera(lookfrom, lookat, p.NewVector(0, 1, 0), fov, 1920, 1080, aperture)
+	camera := p.NewCamera(lookfrom, lookat, p.NewVector(0, 1, 0), fov, width, height, aperture)
 	world := p.World{}
 	world.Add(purpleMatte)
 	world.Add(orangeMatte)
@@ -93,6 +95,8 @@ func main() {
 	start := time.Now()
 	var wg sync.WaitGroup
 	chunkSize := (camera.Height + nthreads - 1) / nthreads
+	done := 0
+	total := width * height
 	for i := 0; i < nthreads; i++ {
 		wg.Add(1)
 
@@ -109,9 +113,11 @@ func main() {
 				for x := 0; x < camera.Width; x++ {
 					rgb := render(camera, world, samples, x, y, rnd)
 					img.Set(x, camera.Height-y-1, rgb)
+					done++
+					fmt.Printf("\rDone: %.2f%%", float64(done)/float64(total)*100)
 				}
 			}
-			fmt.Println("Process", i, "has finished in", time.Since(pstart))
+			fmt.Println("\rProcess", i, "has finished in", time.Since(pstart))
 			wg.Done()
 		}(i)
 	}

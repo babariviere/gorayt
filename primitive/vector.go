@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"time"
 )
 
 // Vector is a mathematical representation of a vector.
@@ -109,8 +110,9 @@ func (v Vector) Color() Color {
 
 // RandomUnitSphere returns a random point in a unit radius sphere
 func RandomUnitSphere() (v Vector) {
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for {
-		v = Vector{rand.Float64(), rand.Float64(), rand.Float64()}.Mul(2.0).Sub(Vector{1, 1, 1})
+		v = Vector{rnd.Float64(), rnd.Float64(), rnd.Float64()}.Mul(2.0).Sub(1.0)
 		if v.Dot(v) < 1 {
 			return
 		}
