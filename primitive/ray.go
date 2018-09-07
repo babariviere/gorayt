@@ -13,5 +13,5 @@ func NewRay(Origin Point, Direction Vector) Ray {
 
 // PointAt gives a point along the ray at factor t
 func (r Ray) PointAt(t float64) Point {
-	return r.Origin.Addv(r.Direction.Mulf(t))
+	return r.Origin.Add(r.Direction.Mul(t))
 }
