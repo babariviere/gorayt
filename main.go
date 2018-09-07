@@ -26,25 +26,19 @@ func color(r p.Ray, w p.World) p.Color {
 }
 
 func main() {
-	nx, ny := 200, 100
-	img := image.NewNRGBA(image.Rect(0, 0, nx, ny))
-	lowerLeft := p.NewVector(-2, -1, -1)
-	horizontal := p.NewVector(4, 0, 0)
-	vertical := p.NewVector(0, 2, 0)
-	origin := p.NewPoint(0, 0, 0)
+	camera := p.DefaultCamera()
 	world := p.World{}
 	world.Add(p.NewSphere(p.NewPoint(0, 0, -1), 0.5))
 	world.Add(p.NewSphere(p.NewPoint(0, -100.5, -1), 100))
-	for y := 0; y < ny; y++ {
-		for x := 0; x < nx; x++ {
-			u := float64(x) / float64(nx)
-			v := float64(y) / float64(ny)
-			r := p.NewRay(origin, lowerLeft.Add(horizontal.Mul(u).Add(vertical.Mul(v))))
+	img := image.NewNRGBA(image.Rect(0, 0, camera.Width, camera.Height))
+	for y := 0; y < camera.Height; y++ {
+		for x := 0; x < camera.Width; x++ {
+			r := camera.GetRay(x, y)
 			col := color(r, world)
 			ir := uint8(255.99 * col.R)
 			ig := uint8(255.99 * col.G)
 			ib := uint8(255.99 * col.B)
-			img.Set(x, ny-y-1, c.NRGBA{
+			img.Set(x, camera.Height-y-1, c.NRGBA{
 				R: ir,
 				G: ig,
 				B: ib,
