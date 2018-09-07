@@ -5,6 +5,7 @@ import (
 	c "image/color"
 	"image/png"
 	"log"
+	"math/rand"
 	"os"
 	p "rayt/primitive"
 )
@@ -26,6 +27,7 @@ func color(r p.Ray, w p.World) p.Color {
 }
 
 func main() {
+	ns := 100
 	camera := p.DefaultCamera()
 	world := p.World{}
 	world.Add(p.NewSphere(p.NewPoint(0, 0, -1), 0.5))
@@ -33,8 +35,12 @@ func main() {
 	img := image.NewNRGBA(image.Rect(0, 0, camera.Width, camera.Height))
 	for y := 0; y < camera.Height; y++ {
 		for x := 0; x < camera.Width; x++ {
-			r := camera.GetRay(x, y)
-			col := color(r, world)
+			var col p.Color = p.NewColor(0, 0, 0)
+			for s := 0; s < ns; s++ {
+				r := camera.GetRay(float64(x)+rand.Float64(), float64(y)+rand.Float64())
+				col = col.Add(color(r, world))
+			}
+			col = col.Div(float64(ns))
 			ir := uint8(255.99 * col.R)
 			ig := uint8(255.99 * col.G)
 			ib := uint8(255.99 * col.B)

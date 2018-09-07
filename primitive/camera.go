@@ -23,11 +23,11 @@ func DefaultCamera() Camera {
 }
 
 // GetRay gets ray at position x, y
-func (c Camera) GetRay(x, y int) Ray {
-	u := float64(x) / float64(c.Width)
-	v := float64(y) / float64(c.Height)
+func (c Camera) GetRay(x, y float64) Ray {
+	u := x / float64(c.Width)
+	v := y / float64(c.Height)
 	hor := c.Horizontal.Mul(u)
 	ver := c.Vertical.Mul(v)
 	horver := hor.Add(ver)
-	return NewRay(c.Origin, c.LowerLeft.Add(horver))
+	return NewRay(c.Origin, c.LowerLeft.Add(horver).Sub(c.Origin))
 }
