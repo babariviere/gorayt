@@ -15,33 +15,42 @@ func NewSphere(Center Point, Radius float64) Sphere {
 	return Sphere{Center, Radius}
 }
 
-func (s Sphere) Hit(r Ray, tmin, tmax float64) (bool, Hit) {
-	var rec Hit
-	oc := NewVector2(r.Origin, s.Center)
+// see: http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
+func (s Sphere) Hit(r Ray, tmin, tmax float64) (_ bool, rec Hit) {
+	l := NewVector2(r.Origin, s.Center)
 	a := r.Direction.Dot(r.Direction)
-	b := oc.Dot(r.Direction)
-	c := oc.Dot(oc) - s.Radius*s.Radius
-	disc := b*b - a*c
-	if disc > 0 {
+	b := r.Direction.Dot(l) * 2
+	c := l.Dot(l) - s.Radius*s.Radius
+	disc := b*b - 4*a*c
+	var t0, t1 float64
+	if disc < 0 {
+		return false, rec
+	} else if disc == 0 {
+		t0 = -0.5 * b / a
+		t1 = t0
+	} else {
 		sqdisc := math.Sqrt(disc)
-		t0 := (-b - sqdisc) / a
-		t1 := (-b + sqdisc) / a
-		if t1 < t0 {
-			t1, t0 = t0, t1
+		if b <= 0 {
+			sqdisc = -sqdisc
 		}
-		if t0 <= tmin {
-			t0 = t1
-			if t0 <= tmin {
-				return false, rec
-			}
-		}
-		if t0 >= tmax {
+		q := -0.5 * (b + sqdisc)
+		t0 = q / a
+		t1 = c / q
+	}
+	if t0 > t1 {
+		t1, t0 = t0, t1
+	}
+	if t0 < tmin {
+		t0 = t1
+		if t0 < tmin {
 			return false, rec
 		}
-		rec.Distance = t0
-		rec.Normal.Origin = r.PointAt(t0)
-		rec.Normal.Direction = rec.Normal.Origin.Sub(s.Center).Vec().Div(s.Radius)
-		return true, rec
 	}
-	return false, rec
+	if t0 > tmax {
+		return false, rec
+	}
+	rec.Distance = t0
+	rec.Normal.Origin = r.PointAt(t0)
+	rec.Normal.Direction = rec.Normal.Origin.Sub(s.Center).Vec().Div(s.Radius)
+	return true, rec
 }

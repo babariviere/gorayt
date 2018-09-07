@@ -17,8 +17,8 @@ func DefaultCamera() Camera {
 		Horizontal: NewVector(4, 0, 0),
 		Vertical:   NewVector(0, 2, 0),
 		Origin:     NewPoint(0, 0, 0),
-		Width:      200,
-		Height:     100,
+		Width:      400,
+		Height:     200,
 	}
 }
 

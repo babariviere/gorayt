@@ -19,3 +19,8 @@ func (c Color) Add(o Color) Color {
 func (c Color) Div(o float64) Color {
 	return Color{c.R / o, c.G / o, c.B / o}
 }
+
+// Vec converts color to a vec
+func (c Color) Vec() Vector {
+	return Vector{c.R, c.G, c.B}
+}
