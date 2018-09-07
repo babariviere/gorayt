@@ -35,6 +35,9 @@ func (s Sphere) Hit(r Ray, tmin, tmax float64) (bool, Hit) {
 				return false, rec
 			}
 		}
+		if t0 >= tmax {
+			return false, rec
+		}
 		rec.Distance = t0
 		rec.Normal.Origin = r.PointAt(t0)
 		rec.Normal.Direction = rec.Normal.Origin.Sub(s.Center).Vec().Div(s.Radius)
