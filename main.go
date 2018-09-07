@@ -1,7 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"image"
+	c "image/color"
+	"image/png"
+	"log"
+	"os"
 	p "rayt/primitive"
 )
 
@@ -23,9 +27,7 @@ func color(r p.Ray, w p.World) p.Color {
 
 func main() {
 	nx, ny := 200, 100
-	fmt.Println("P3")
-	fmt.Println(nx, ny)
-	fmt.Println("255")
+	img := image.NewNRGBA(image.Rect(0, 0, nx, ny))
 	lowerLeft := p.NewVector(-2, -1, -1)
 	horizontal := p.NewVector(4, 0, 0)
 	vertical := p.NewVector(0, 2, 0)
@@ -33,16 +35,34 @@ func main() {
 	world := p.World{}
 	world.Add(p.NewSphere(p.NewPoint(0, 0, -1), 0.5))
 	world.Add(p.NewSphere(p.NewPoint(0, -100.5, -1), 100))
-	for j := ny - 1; j >= 0; j-- {
-		for i := 0; i < nx; i++ {
-			u := float64(i) / float64(nx)
-			v := float64(j) / float64(ny)
+	for y := 0; y < ny; y++ {
+		for x := 0; x < nx; x++ {
+			u := float64(x) / float64(nx)
+			v := float64(y) / float64(ny)
 			r := p.NewRay(origin, lowerLeft.Add(horizontal.Mul(u).Add(vertical.Mul(v))))
 			col := color(r, world)
 			ir := uint8(255.99 * col.R)
 			ig := uint8(255.99 * col.G)
 			ib := uint8(255.99 * col.B)
-			fmt.Println(ir, ig, ib)
+			img.Set(x, ny-y-1, c.NRGBA{
+				R: ir,
+				G: ig,
+				B: ib,
+				A: 255,
+			})
 		}
+	}
+	f, err := os.Create("image.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := png.Encode(f, img); err != nil {
+		f.Close()
+		log.Fatal(err)
+	}
+
+	if err := f.Close(); err != nil {
+		log.Fatal(err)
 	}
 }
