@@ -32,6 +32,7 @@ func main() {
 	origin := p.NewPoint(0, 0, 0)
 	world := p.World{}
 	world.Add(p.NewSphere(p.NewPoint(0, 0, -1), 0.5))
+	world.Add(p.NewSphere(p.NewPoint(0, -100.5, -1), 100))
 	for j := ny - 1; j >= 0; j-- {
 		for i := 0; i < nx; i++ {
 			u := float64(i) / float64(nx)

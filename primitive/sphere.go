@@ -15,41 +15,30 @@ func NewSphere(Center Point, Radius float64) Sphere {
 	return Sphere{Center, Radius}
 }
 
-func solveQuadratic(a, b, c float64, t0, t1 *float64) bool {
-	disc := b*b - 4*a*c
-	if disc < 0 {
-		return false
-	} else if disc == 0 {
-		*t0 = -0.5 * b / a
-		*t1 = *t0
-	} else {
-		var q float64
-		if b > 0 {
-			q = -0.5 * (b + math.Sqrt(disc))
-		} else {
-			q = -0.5 * (b - math.Sqrt(disc))
-		}
-		*t0 = q / a
-		*t1 = c / q
-	}
-	return true
-}
-
 func (s Sphere) Hit(r Ray, tmin, tmax float64) (bool, Hit) {
 	var rec Hit
-	var t0, t1 float64
-	l := NewVector2(r.Origin, s.Center)
+	oc := NewVector2(r.Origin, s.Center)
 	a := r.Direction.Dot(r.Direction)
-	b := 2 * r.Direction.Dot(l)
-	c := l.Dot(l) - s.Radius*s.Radius
-	if !solveQuadratic(a, b, c, &t0, &t1) {
-		return false, rec
+	b := oc.Dot(r.Direction)
+	c := oc.Dot(oc) - s.Radius*s.Radius
+	disc := b*b - a*c
+	if disc > 0 {
+		sqdisc := math.Sqrt(disc)
+		t0 := (-b - sqdisc) / a
+		t1 := (-b + sqdisc) / a
+		if t1 < t0 {
+			t1, t0 = t0, t1
+		}
+		if t0 <= tmin {
+			t0 = t1
+			if t0 <= tmin {
+				return false, rec
+			}
+		}
+		rec.Distance = t0
+		rec.Normal.Origin = r.PointAt(t0)
+		rec.Normal.Direction = rec.Normal.Origin.Sub(s.Center).Vec().Div(s.Radius)
+		return true, rec
 	}
-	if t1 < t0 {
-		t1, t0 = t0, t1
-	}
-	rec.Distance = t0
-	rec.Normal.Origin = r.PointAt(t0)
-	rec.Normal.Direction = rec.Normal.Origin.Sub(s.Center).Vec().Div(s.Radius)
-	return true, rec
+	return false, rec
 }
